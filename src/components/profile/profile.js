@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from "react"
 import { ProfileContext } from "./ProfileProvider.js"
-import "./Profile.css"
+// import "./Profile.css"
 
 
 export const Profile = () => {
@@ -38,6 +38,7 @@ export const Profile = () => {
                                 <div>
                                     {event.date} @ {event.time}
                                 </div>
+                                <hr></hr>
                             </div>
                         })
                     }

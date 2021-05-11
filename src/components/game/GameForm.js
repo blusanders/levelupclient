@@ -1,32 +1,37 @@
 import React, { useContext, useState, useEffect } from "react"
 import { GameContext } from "./GameProvider.js"
-import { useHistory } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 
 
 export const GameForm = () => {
     const history = useHistory()
-    const { createGame, getGameTypes, gameTypes } = useContext(GameContext)
+    const { createGame, getGameTypes, gameTypes, getGameById, updateGame } = useContext(GameContext)
+    const {gameId} = useParams()
+    const [isLoading, setIsLoading] = useState(true);
 
-    /*
-        Since the input fields are bound to the values of
-        the properties of this state variable, you need to
-        provide some default values.
-    */
     const [currentGame, setCurrentGame] = useState({
-        skillLevel: 1,
+        skillLevel: 0,
         numberOfPlayers: 0,
         title: "",
         maker: "",
         gameTypeId: 0
     })
 
-    /*
-        Get game types on initialization so that the <select>
-        element presents game type choices to the user.
-    */
     useEffect(() => {
         getGameTypes()
+        .then(()=>{
+            if(gameId){
+                getGameById(gameId)
+                .then(game => {
+                    // debugger
+                    setCurrentGame(game)
+                    setIsLoading(false)
+                })
+            }
+        })
     }, [])
+    
+
 
     const handleInputChange = (event) => {
         const newGame = { ...currentGame }
@@ -37,13 +42,16 @@ export const GameForm = () => {
     return (
 
         <form className="gameForm">
-            <h2 className="gameForm__title">Register New Game</h2>
+            <h2 className="gameForm__title">
+            {gameId ? "Edit Game" : "Register New Game"}
+                
+            </h2>
 
             <fieldset>
                 <div className="form-group">
                     <label htmlFor="gameTypeId">Game Type: </label>
                     <select name="gameTypeId" required className="form-control"
-                        value={currentGame.gameTypeId}
+                        value={currentGame.game_type_id}
                         onChange={handleInputChange}
                     >
                         <option value="0">Select a Game Type</option>
@@ -78,7 +86,7 @@ export const GameForm = () => {
                 <div className="form-group">
                     <label htmlFor="numberOfPlayers"># of Players: </label>
                     <input type="text" name="numberOfPlayers" required autoFocus className="form-control"
-                        value={currentGame.numberOfPlayers}
+                        value={currentGame.number_of_players}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -88,7 +96,7 @@ export const GameForm = () => {
                 <div className="form-group">
                     <label htmlFor="skillLevel">Skill Level: </label>
                     <input type="text" name="skillLevel" required autoFocus className="form-control"
-                        value={currentGame.skillLevel}
+                        value={currentGame.skill_level}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -108,10 +116,17 @@ export const GameForm = () => {
                     }
 
                     // Send POST request to your API
-                    createGame(game)
+                    {gameId ? 
+                        updateGame(game)
                         .then(() => history.push("/"))
+                    : 
+                        createGame(game)
+                        .then(() => history.push("/"))
+                    }
                 }}
-                className="btn btn-primary">Create</button>
+                className="btn btn-primary">
+                {gameId ? "Edit Game" : "Create Game"}
+                </button>
         </form>
     )
 }
