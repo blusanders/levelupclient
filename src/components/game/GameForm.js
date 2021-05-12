@@ -24,14 +24,21 @@ export const GameForm = () => {
                 getGameById(gameId)
                 .then(game => {
                     // debugger
-                    setCurrentGame(game)
+                    setCurrentGame(
+                        {
+                            skillLevel: game.skill_level,
+                            numberOfPlayers: game.number_of_players,
+                            title: game.title,
+                            maker: game.maker,
+                            gameTypeId: game.game_type.id
+                        }
+                    )
                     setIsLoading(false)
                 })
             }
         })
     }, [])
     
-
 
     const handleInputChange = (event) => {
         const newGame = { ...currentGame }
@@ -47,20 +54,6 @@ export const GameForm = () => {
                 
             </h2>
 
-            <fieldset>
-                <div className="form-group">
-                    <label htmlFor="gameTypeId">Game Type: </label>
-                    <select name="gameTypeId" required className="form-control"
-                        value={currentGame.game_type_id}
-                        onChange={handleInputChange}
-                    >
-                        <option value="0">Select a Game Type</option>
-                        {
-                            gameTypes.map(gameType => <option key={gameType.id} value={gameType.id}>{gameType.label}</option>)
-                        }
-                    </select>
-                </div>
-            </fieldset>
 
             <fieldset>
                 <div className="form-group">
@@ -84,9 +77,23 @@ export const GameForm = () => {
 
             <fieldset>
                 <div className="form-group">
+                    <label htmlFor="gameTypeId">Game Type: </label>
+                    <select name="gameTypeId" required className="form-control"
+                        value={currentGame.gameTypeId}
+                        onChange={handleInputChange}
+                    >
+                        {
+                            gameTypes.map(gt => <option key={gt.id} value={gt.id}>{gt.label}</option>)
+                        }
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <div className="form-group">
                     <label htmlFor="numberOfPlayers"># of Players: </label>
                     <input type="text" name="numberOfPlayers" required autoFocus className="form-control"
-                        value={currentGame.number_of_players}
+                        value={currentGame.numberOfPlayers}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -96,7 +103,7 @@ export const GameForm = () => {
                 <div className="form-group">
                     <label htmlFor="skillLevel">Skill Level: </label>
                     <input type="text" name="skillLevel" required autoFocus className="form-control"
-                        value={currentGame.skill_level}
+                        value={currentGame.skillLevel}
                         onChange={handleInputChange}
                     />
                 </div>
@@ -107,6 +114,7 @@ export const GameForm = () => {
                     // Prevent form from being submitted
                     evt.preventDefault()
 
+                    //I am not using this const
                     const game = {
                         maker: currentGame.maker,
                         title: currentGame.title,
@@ -117,10 +125,10 @@ export const GameForm = () => {
 
                     // Send POST request to your API
                     {gameId ? 
-                        updateGame(game)
+                        updateGame(gameId, currentGame)
                         .then(() => history.push("/"))
                     : 
-                        createGame(game)
+                        createGame(currentGame)
                         .then(() => history.push("/"))
                     }
                 }}

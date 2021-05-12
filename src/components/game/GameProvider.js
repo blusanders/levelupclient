@@ -40,8 +40,10 @@ export const GameProvider = (props) => {
         // .then(response => response.json())
     }
     
-    const updateGame = (game) => {
-        return fetch(`http://localhost:8000/games/${game.id}`, {
+    const updateGame = (id, game) => {
+        let fetchURL = `http://localhost:8000/games/${id}` 
+        // debugger
+        return fetch(fetchURL, {
             method: "PUT",
             headers: {
                 "Authorization": `Token ${localStorage.getItem("lu_token")}`,
@@ -49,8 +51,8 @@ export const GameProvider = (props) => {
             },
             body: JSON.stringify(game)
         })
-        .then(response => response.json())
-        .then(getGames)
+        // .then(response => response.json())
+        // .then(getGames)
     }
     
     const getGameTypes = () => {
